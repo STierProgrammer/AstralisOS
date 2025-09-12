@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.cpp": "cpp",
+        "misc.h": "c",
+        "bootstub.h": "c",
+        "stdint.h": "c"
+    }
+}
