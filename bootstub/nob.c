@@ -1,4 +1,8 @@
-#include "nob++.h"
+#define NOB_IMPLEMENTATION
+#define NOB_STRIP_PREFIX
+
+#include "nob.h"
+
 #include <stddef.h>
 
 #define SRC_FOLDER "src/"

@@ -1,5 +1,50 @@
-#include "mem/pmm.h"
-#include "def.h"
+#pragma once
+
+#include <stdint.h>
+#include <stddef.h>
+
+#define PAGE_SIZE 4096
+#define ALIGN_UP(address, alignment) (((address) + (alignment - 1)) & ~((alignment) - 1))
+#define ALIGN_DOWN(address, alignment) ((address) & ~((alignment) - 1))
+
+#define enable_interrupts() __asm__ ("cli")
+#define disable_interrupts() __asm__ ("sti")
+
+typedef uint64_t virt_addr_t;
+typedef uint64_t physc_addr_t;
+
+static inline void hcf(void)
+{
+  for (;;)
+  {
+    __asm__("hlt");
+  }
+}
+
+static inline void outb(uint16_t port, uint8_t val)
+{
+  __asm__ volatile("outb %b0, %w1" ::"a"(val), "Nd"(port) : "memory");
+}
+
+static inline uint8_t inb(uint16_t port)
+{
+  uint8_t ret;
+  __asm__ volatile("inb %w1, %b0" : "=a"(ret) : "Nd"(port) : "memory");
+  return ret;
+}
+
+static inline uint64_t read_cr3(void)
+{
+    uint64_t val;
+    __asm__ volatile(
+        "mov %%cr3, %0" : "=r"(val));
+    return val;
+}
+
+static inline void set_cr3(uint64_t val)
+{
+    __asm__ volatile("mov %0, %%cr3" :: "r"(val));
+}
 
 // NOTE: This implementation is a slightly modified version of that of the linux kernel itself.
 // https://github.com/torvalds/linux/blob/b1bc554e009e3aeed7e4cfd2e717c7a34a98c683/tools/firewire/list.h
@@ -40,28 +85,4 @@ static inline void list_remove(list_t *list) {
     list->next->prev = list->prev;
     list->next = list;
     list->prev = list;
-}
-
-typedef struct cache_t
-{
-    list_t slabs_full, slabs_partial, slabs_free;
-    size_t obj_size;
-    size_t obj_per_slab;
-} cache_t;
-
-typedef struct slab_t
-{
-    list_t slabs;
-    virt_addr_t addr;
-    cache_t* cache;
-} slab_t;
-
-static inline size_t slab_mem(cache_t *cache)
-{
-    return cache->obj_size * cache->obj_per_slab + sizeof(slab_t);
-}
-
-void cache_grow(cache_t *cache)
-{
-
 }

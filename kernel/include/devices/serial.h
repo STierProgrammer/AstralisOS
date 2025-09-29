@@ -1,9 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-#include <stdarg.h>
-#include "misc.h"
-
 #define COM1_PORT 0x3f8
 
 int init_serial();

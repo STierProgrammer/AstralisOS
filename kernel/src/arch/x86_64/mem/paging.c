@@ -1,9 +1,12 @@
 #include <stddef.h>
 
+#include "string.h"
 #include "mem/pmm.h"
-#include "libc/string.h"
-#include "paging/paging.h"
-#include "misc.h"
+
+#if defined(__x86_64__) || defined(_M_X64)
+#include "arch/x86_64/mem/paging.h"
+#include "arch/x86_64/def.h"
+#endif
 
 extern page_table_t *pml4;
 extern kernel_params_t *kernel_params;
@@ -21,20 +24,18 @@ static void set_page_entry(uint64_t *entry)
     if (!(*entry & PAGE_PRESENT))
     {
         *entry = 0;
-        *entry |= PAGE_PRESENT;
-        *entry |= PAGE_READ_WRITE;
-        *entry |= PAGE_USER_SUPERVISOR;
-        *entry |= palloc() & PAGE_PHYSICAL_ADDRESS_MASK;
+        *entry |= (PAGE_PRESENT | PAGE_READ_WRITE | PAGE_USER_SUPERVISOR);
+        *entry |= palloc(PAGE_SIZE) & PAGE_PHYSICAL_ADDRESS_MASK;
         memset((void *)((*entry & PAGE_PHYSICAL_ADDRESS_MASK) + kernel_params->hhdm), 0, PAGE_SIZE);
     }
 }
 
-void map_page_table(physc_addr_t physical_addr, virt_addr_t virtual_addr, uint16_t flags)
+void map_page_table(physc_addr_t physc_addr, virt_addr_t virt_addr, uint16_t flags)
 {
-    size_t pml4_index = (virtual_addr >> 39) & 0x1FF;
-    size_t pml3_index = (virtual_addr >> 30) & 0x1FF;
-    size_t pml2_index = (virtual_addr >> 21) & 0x1FF;
-    size_t pml_index  = (virtual_addr >> 12) & 0x1FF;
+    size_t pml4_index = (virt_addr >> 39) & 0x1FF;
+    size_t pml3_index = (virt_addr >> 30) & 0x1FF;
+    size_t pml2_index = (virt_addr >> 21) & 0x1FF;
+    size_t pml_index  = (virt_addr >> 12) & 0x1FF;
 
     set_page_entry(&pml4->entries[pml4_index]);
     
@@ -45,7 +46,26 @@ void map_page_table(physc_addr_t physical_addr, virt_addr_t virtual_addr, uint16
     set_page_entry(&pml2->entries[pml2_index]);
 
     page_table_t *pml = (page_table_t*)((pml2->entries[pml2_index] & PAGE_PHYSICAL_ADDRESS_MASK) + kernel_params->hhdm);
-    pml->entries[pml_index] = (physical_addr & PAGE_PHYSICAL_ADDRESS_MASK) | (flags & 0xFFF);
+    pml->entries[pml_index] = (physc_addr & PAGE_PHYSICAL_ADDRESS_MASK) | (flags & 0xFFF);
+}
+
+void unmap_page_table(virt_addr_t virt_addr)
+{
+    size_t pml4_index = (virt_addr >> 39) & 0x1FF;
+    size_t pml3_index = (virt_addr >> 30) & 0x1FF;
+    size_t pml2_index = (virt_addr >> 21) & 0x1FF;
+    size_t pml_index  = (virt_addr >> 12) & 0x1FF;
+
+    page_table_t *pml3 = (page_table_t*)((pml4->entries[pml4_index] & PAGE_PHYSICAL_ADDRESS_MASK) + kernel_params->hhdm);
+    page_table_t *pml2 = (page_table_t*)((pml3->entries[pml3_index] & PAGE_PHYSICAL_ADDRESS_MASK) + kernel_params->hhdm);
+    page_table_t *pml = (page_table_t*)((pml2->entries[pml2_index] & PAGE_PHYSICAL_ADDRESS_MASK) + kernel_params->hhdm);
+
+    // if (pml3->entries[pml3_index] || pml2->entries[pml2_index] || pml->entries[pml_index])
+    // {
+    //     pml3->entries[pml3_index] = 0;
+    //     pml2->entries[pml2_index] = 0;
+    //     pml->entries[pml_index] = 0;
+    // }
 }
 
 static void map_section(char section_begin[], char section_end[], uint8_t flags) 

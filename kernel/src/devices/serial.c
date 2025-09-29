@@ -1,4 +1,11 @@
-#include "serial.h"
+#include <stdint.h>
+#include <stdarg.h>
+#include <stddef.h>
+
+#include "devices/serial.h"
+#if defined(__x86_64__) || defined(_M_X64)
+#include "arch/x86_64/def.h"
+#endif
 
 int init_serial()
 {
@@ -101,19 +108,6 @@ void srprintf(const char *fmt, ...)
 
                 for (int i = 63; i >= 0; i--) {
                     srput(str[i]);
-                }
-
-                break;
-            }
-            case 'b': {
-                int value = va_arg(args, int);
-
-                if (value == 0) {
-                    srputs("false");
-                } else if (value == 1) {
-                    srputs("true");
-                } else {
-                    srputs("corrupted");
                 }
 
                 break;

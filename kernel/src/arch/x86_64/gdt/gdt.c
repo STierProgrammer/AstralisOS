@@ -1,4 +1,4 @@
-#include "gdt.h"
+#include "arch/x86_64/gdt/gdt.h"
 #include "devices/serial.h"
 
 static struct GDT gdt = {

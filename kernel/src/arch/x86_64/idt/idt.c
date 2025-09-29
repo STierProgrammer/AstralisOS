@@ -1,5 +1,5 @@
-#include "idt.h"
-#include "isr_handlers.h"
+#include "arch/x86_64/idt/idt.h"
+#include "arch/x86_64/idt/isr_handlers.h"
 
 static idt_t idt __attribute__((aligned(4096)));
 static idtr_t idtr __attribute__((aligned(16))) = {
