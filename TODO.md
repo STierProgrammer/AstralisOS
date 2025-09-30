@@ -1,6 +1,6 @@
-- HAL
-- Heap/VMM
-- VFS
-- Drivers
-- Userspace
-- PE
+[x] HAL
+[x] Slab Allocator
+[] VMM
+[] VFS
+[] Drivers
+[] Userspace
