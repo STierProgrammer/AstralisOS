@@ -10,7 +10,6 @@ static bootloader_ctx_t bootloader_ctx;
 static void load_bootloader_ctx(void);
 extern void kmain(bootloader_ctx_t *ctx);
 
-#ifdef __protocol_limine__
 #define LIMINE_API_REVISION 4
 #include "limine.h"
 
@@ -178,14 +177,3 @@ void kstart(void)
     load_bootloader_ctx();
     kmain(&bootloader_ctx);
 }
-#elif __protocol_multiboot1__
-void kstart()
-{
-
-}
-
-void load_bootloader_ctx(void)
-{
-
-}
-#endif

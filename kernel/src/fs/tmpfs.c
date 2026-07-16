@@ -31,6 +31,7 @@ typedef struct tmpfs_inode_t {
     tmpfs_data_t *data;
 } tmpfs_inode_t;
 
+
 inode_t *tmpfs_inode_create(inode_kind_t kind, const inode_ops_t *ops)
 {
     inode_t *inode = cache_alloc(inode_cache);
@@ -228,6 +229,8 @@ long tmpfs_write(inode_t *inode, const void *in_buf, size_t count, size_t offset
 
 int tmpfs_mount_root(inode_t **root)
 {
+    
+
     return (*root = tmpfs_inode_create(INODE_DIR, &dir_ops)) ? SUCCESS : -OUT_OF_MEMORY;
 }
 

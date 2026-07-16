@@ -5,7 +5,6 @@
 #include <fs/tar.h>
 #include <string.h>
 
-
 static inode_t *initrd_inode = NULL;
 
 void initrd_init(void)

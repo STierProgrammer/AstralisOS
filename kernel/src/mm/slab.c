@@ -37,6 +37,11 @@ void slab_init(void)
 cache_t *cache_create(const char *name, size_t obj_size)
 {
     cache_t *cache = cache_alloc(caches_cache);
+    
+    // Simple hack to avoid corruption
+    if (obj_size < 2 * sizeof(uintptr_t))
+        obj_size = 2 * sizeof(uintptr_t);
+
     cache_init(cache, name, obj_size);
     list_append(&caches_cache->list, &cache->list);
 

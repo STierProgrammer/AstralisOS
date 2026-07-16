@@ -51,9 +51,11 @@ void task_switch(task_t *from, task_t *to)
 {
     (void)from;
     curr_task = to;
-
+    tss.rsp0 = (uint64_t)to->kernel_stack.base + to->kernel_stack.size;
     if (to->pt && to->pt != from->pt)
+    {
         pt_swap(to->pt);
+    }
 }
 
 void sched_schedule(task_t *task)
@@ -168,6 +170,9 @@ task_t *kernel_task_create(void (*entry)())
     task->pid = next_pid++;
     list_init(&task->list);
 
+    for (size_t i = 0; i < 256; i++)
+        task->fd[i] = (file_t){0};
+
     return task;
 }
 
@@ -248,6 +253,61 @@ static void reaper_task_entry(void)
     sched_unschedule(curr_task);
     sti();
     task_yield();
+}
+
+static int task_find_fd(task_t *task)
+{
+    for (size_t i = 0; i < 256; i++)
+    {
+        if (task->fd[i].inode == NULL)
+            return i;
+    }
+    return -1;
+}
+
+int task_open(task_t *task, const char *path)
+{
+    inode_t *ret = NULL;
+    const path_t p = vfs_path_from_abs(path);
+    if (vfs_lookup(&p, &ret) < 0)
+        return -1;
+    
+    int fd = task_find_fd(task);
+    task->fd[fd].inode  = ret;
+    task->fd[fd].offset = 0;
+    return fd;
+}
+
+int task_close(task_t *task, int fd)
+{
+    task->fd[fd].inode = NULL;
+    task->fd[fd].offset = 0;
+    return 0;
+}
+
+long task_read(task_t *task, int fd, void *buf, size_t count)
+{
+    inode_t *inode = task->fd[fd].inode;
+    if (!inode)
+        return -1;
+
+    size_t offset = task->fd[fd].offset;
+    return inode_read(inode, buf, count, offset);
+}
+
+long task_write(task_t *task, int fd, const void *buf, size_t count)
+{
+    inode_t *inode = task->fd[fd].inode;
+    if (!inode)
+        return -1;
+
+    size_t offset = task->fd[fd].offset;
+    return inode_write(inode, buf, count, offset);   
+}
+
+task_t *sched_curr_task(void)
+{
+    return curr_task;
 }
 
 void sched_init(void)

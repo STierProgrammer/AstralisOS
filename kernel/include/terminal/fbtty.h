@@ -13,7 +13,6 @@ typedef struct fbtty_t {
 
 void fbtty_init(fbtty_t *tty, fb_t *fb);
 void fbtty_write_char(fbtty_t *tty, const char ch);
-void fbtty_write_str(fbtty_t *tty, const char *str);
 void fbtty_backspace(fbtty_t *tty);
 
 

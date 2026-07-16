@@ -4,6 +4,12 @@
 #include <stdint.h>
 #include <libds/include/list.h>
 
+typedef struct slab_freelist_t slab_freelist_t;
+typedef struct slab_freelist_t 
+{
+    slab_freelist_t *next;
+} slab_freelist_t;
+
 /* TODO: Add colouring */
 /* TODO: Add flags */
 typedef struct

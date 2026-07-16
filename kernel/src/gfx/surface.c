@@ -79,11 +79,13 @@ void gfx_surface_sync_chunk(
 
 void gfx_draw_rect(gfx_surface_t *surface, int x, int y, size_t width, size_t height, uint32_t color)
 {
+    uint32_t *line = surface->backbuffer + x + y * surface->framebuffer->pitch / 4;
     for (int i = 0; i < (int)height; ++i)
     {
         for (int j = 0; j < (int)width; ++j)
         {
-            gfx_surface_put_pixel(surface, x  + j, y + i, color);
+            line[j] = color;
         }
+        line += surface->framebuffer->pitch / 4;
     }
 }
