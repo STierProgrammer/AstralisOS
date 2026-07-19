@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <libds/include/list.h>
 #include <fs/vfs.h>
+#include <tasks/elf.h>
 
 typedef struct 
 {
@@ -34,7 +35,7 @@ void sched_unschedule(task_t *task);
 task_t *sched_curr_task(void);
 
 task_t* kernel_task_create(void (*entry)());
-task_t* user_task_create(uint64_t addr, size_t size);
+task_t *user_task_create(Elf64_Ehdr *hdr);
 
 void    task_sleep(void);
 void    task_wake_all_up(void);

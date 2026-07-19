@@ -1,7 +1,7 @@
+#include <tasks/elf.h>
 #include <misc/panic.h>
 #include <misc/darray.h>
 #include <mm/alloc.h>
-#include "libinput/include/kbd.h"
 #include <drvs/cmos.h>
 #include <drvs/rtc/rtc.h>
 #include "tasks/sched.h"
@@ -103,12 +103,25 @@ void kmain(bootloader_ctx_t *ctx)
     inode_t *cool = NULL;
     initrd_get("cool", &cool); 
 
-    static char asmbuf[4096] = { 0 };
+    char asmbuf[4096] = { 0 };
     inode_read(cool, asmbuf, 4096, 0);
-    
-    task_t *user_task = user_task_create((uint64_t)asmbuf, 4096);
-    sched_schedule(user_task); 
-    
+ 
+    inode_t *test_program = NULL;
+    initrd_get("test_program", &test_program);
+    if (test_program)
+    {
+        debug("Found the test program");
+    }
+
+    char programbuf[4096] = { 0 };
+    inode_read(test_program, programbuf, 4096, 0);
+    Elf64_Ehdr *hdr = (Elf64_Ehdr*)programbuf;
+    if (elf_supported(hdr))
+    {
+        task_t *task = user_task_create(hdr);
+        sched_schedule(task);
+    }
+ 
     sched_init();
     while (1)
         task_yield();

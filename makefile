@@ -32,6 +32,17 @@ run:
 		-m 2g \
 		$(BUILD_DIR)/image.iso
 
+debug:
+	@qemu-system-x86_64 \
+		-serial stdio \
+		-d int \
+		-D qemu.log \
+		-no-reboot \
+		-no-shutdown \
+		-m 2g \
+		-s -S \
+		$(BUILD_DIR)/image.iso
+
 clean:
 	rm -rf $(BUILD_DIR)
 	

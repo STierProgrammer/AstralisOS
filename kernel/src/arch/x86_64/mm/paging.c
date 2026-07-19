@@ -129,6 +129,7 @@ void pt_map(page_table_t *pt, paddr_t paddr, vaddr_t vaddr, page_flags_t flags)
     pt1->entries[pt1_idx] = (paddr & PAGE_PHYSICAL_ADDRESS_MASK) | flags;
 }
 
+
 void pt_unmap(page_table_t *pt, vaddr_t vaddr)
 {
     size_t pt4_idx = (vaddr >> 39) & 0x1FF;

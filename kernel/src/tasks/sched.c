@@ -1,4 +1,5 @@
 #include "kernel.h"
+#include <tasks/elf.h>
 #include "mm/pmm/pmm.h"
 #include <string.h>
 #ifdef __ARCH_X86_64__
@@ -178,24 +179,34 @@ task_t *kernel_task_create(void (*entry)())
 
 extern void user_task_prelude(void);
 
-task_t *user_task_create(uint64_t addr, size_t size)
+static page_flags_t elf_pflags_to_page_flags(Elf64_Word pflags)
+{
+    page_flags_t flags = 0;
+    if (pflags & PF_R)
+        flags |= PAGE_FLAG_PRESENT;
+    if (pflags & PF_W)
+        flags |= PAGE_FLAG_READ_WRITE;
+    return flags;
+}
+
+task_t *user_task_create(Elf64_Ehdr *hdr)
 {
     task_t *task = task_alloc();
     
     stack_allocate(&task->kernel_stack);
     
-    vaddr_t stack_start = 0x00007FFFFFFFFFFF;
-    task->user_stack.base = (void*)stack_start;
-    task->user_stack.size = TASK_STACK_NUM_PAGES;
-    task->user_stack.sp   = (char*)stack_start + TASK_STACK_NUM_PAGES;
+    vaddr_t stack_top = align_down(0x00007FFFFFFFF000, PAGE_SIZE) - PAGE_SIZE;
 
+    task->user_stack.base = (void*)(stack_top - TASK_STACK_NUM_PAGES * PAGE_SIZE);
+    task->user_stack.size = TASK_STACK_NUM_PAGES * PAGE_SIZE;
+    task->user_stack.sp   = (void*)stack_top;    
     uint64_t *krsp = (uint64_t*)task->kernel_stack.sp;
 
     *(--krsp) = offsetof(gdt_t, user_data_segment) | 0x3;
     *(--krsp) = (uint64_t)task->user_stack.sp;
     *(--krsp) = 0x202;
     *(--krsp) = offsetof(gdt_t, user_code_segment) | 0x3;
-    *(--krsp) = 0x400000;
+    *(--krsp) = hdr->e_entry;
     *(--krsp) = (uint64_t)user_task_prelude;
     krsp -= 6;
 
@@ -208,24 +219,43 @@ task_t *user_task_create(uint64_t addr, size_t size)
 
     for (size_t i = 0; i < TASK_STACK_NUM_PAGES; ++i)
     {
+        vaddr_t vaddr = stack_top - i * PAGE_SIZE;
         pt_map(
                 task->pt, 
                 base + i * PAGE_SIZE, 
-                stack_start + i * PAGE_SIZE, 
+                vaddr,
                 PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_USER_SUPERVISOR
                 );
     }
 
-    paddr_t p = pmm_alloc(1);
-    pt_map(
-                task->pt, 
-                p, 
-                0x400000, 
-                PAGE_FLAG_PRESENT 
-                | PAGE_FLAG_READ_WRITE | PAGE_FLAG_USER_SUPERVISOR
-        );
+    debug("Entry: %x", hdr->e_entry);
 
-    memcpy((void*)to_vaddr(p), (void*)addr, size);
+    Elf64_Phdr *phdr = (Elf64_Phdr*)((char*)hdr + hdr->e_phoff);
+    for (size_t i = 0; i < hdr->e_phnum; i++)
+    {
+        if (phdr->p_type == PT_LOAD)
+        {
+            size_t pages  = align_up(phdr->p_filesz, PAGE_SIZE) / PAGE_SIZE;
+            vaddr_t vaddr = phdr->p_vaddr;
+            char*   src   = (char*)hdr + phdr->p_offset;
+            for (size_t j = 0; j < pages; j++)
+            {
+                paddr_t page = pmm_alloc(1);
+                pt_map(
+                        task->pt, 
+                        page,
+                        vaddr,
+                        elf_pflags_to_page_flags(phdr->p_flags) | PAGE_FLAG_USER_SUPERVISOR
+                        );
+
+                memcpy((void*)to_vaddr(page), src, PAGE_SIZE);
+                vaddr += PAGE_SIZE;
+                src   += PAGE_SIZE;
+            }
+        }
+        phdr = (Elf64_Phdr*)((char*)phdr + hdr->e_phentsize);
+    }
+
     task->pid = next_pid++;
     list_init(&task->list);
     

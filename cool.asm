@@ -8,5 +8,3 @@ start:
 
 sigma:
     db "sigma.txt", 0
-
-

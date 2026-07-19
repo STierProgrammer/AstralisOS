@@ -3,11 +3,11 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#define EI_NIDENT 16
-#define ELFMAG0 0x7f
-#define ELFMAG1 'E'
-#define ELFMAG2 'L'
-#define ELFMAG3 'F'
+#define EI_NIDENT   16
+#define ELFMAG0     0x7f
+#define ELFMAG1     'E'
+#define ELFMAG2     'L'
+#define ELFMAG3     'F'
 
 enum
 {
@@ -159,6 +159,18 @@ enum
     ELFOSABI_NSK
 };
 
+enum
+{
+    PT_LOAD = 1,
+};
+
+enum
+{
+    PF_X = 1,
+    PF_W,
+    PF_R
+};
+
 /* 32-bit */
 typedef uint32_t Elf32_Addr;
 typedef uint32_t Elf32_Off;
@@ -223,8 +235,6 @@ typedef struct
     Elf64_Xword p_align;
 } Elf64_Phdr;
 
-static inline bool elf_file_verify(const char *elf_bin)
-{
-    return elf_bin[EI_MAG0] == ELFMAG0 && elf_bin[EI_MAG1] == ELFMAG1 && elf_bin[EI_MAG2] == ELFMAG2;
-}
+bool elf_verify(Elf64_Ehdr *hdr);
+bool elf_supported(Elf64_Ehdr *hdr);
 
