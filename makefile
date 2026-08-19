@@ -17,6 +17,7 @@ INITRD_DIR  := initrd/
 INITRD_ZIP  := initrd.tar
 
 initrd: directories
+	rm -f $(BOOT_DIR)/$(INITRD_ZIP)
 	@tar -cvf $(BOOT_DIR)/$(INITRD_ZIP) $(INITRD_DIR)
 
 iso: build
@@ -30,6 +31,7 @@ run:
 		-no-reboot \
 		-no-shutdown \
 		-m 2g \
+		-monitor telnet:127.0.0.1:1235,server,nowait\
 		$(BUILD_DIR)/image.iso
 
 debug:

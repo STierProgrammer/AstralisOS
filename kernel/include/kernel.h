@@ -5,8 +5,8 @@
 
 #define PAGE_SIZE 4096
 
-#define to_vaddr(paddr) (vaddr_t)((paddr) + krnl_ctx.bootloader_ctx->hhdm)
-#define to_paddr(vaddr) ((paddr_t)((vaddr) - krnl_ctx.bootloader_ctx->hhdm))
+#define to_vaddr(paddr) (vaddr_t)(((uintptr_t)(paddr)) + krnl_ctx.bootloader_ctx->hhdm)
+#define to_paddr(vaddr) ((paddr_t)(((uintptr_t)(vaddr)) - krnl_ctx.bootloader_ctx->hhdm))
 
 #define paddr_ptr(paddr) (void*)(to_vaddr((paddr)))
 

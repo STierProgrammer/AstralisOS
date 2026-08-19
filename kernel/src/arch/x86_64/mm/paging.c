@@ -2,7 +2,7 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
-
+#include "misc/debug.h"
 #include <bootstub.h>
 
 #include <arch/x86_64/mm/paging.h>
@@ -31,7 +31,7 @@ static void set_page_entry(page_entry_t *entry)
     if (!(*entry & PAGE_FLAG_PRESENT))
     {
         *entry = 0;
-        *entry |= (PAGE_FLAG_PRESENT | PAGE_FLAG_READ_WRITE | PAGE_FLAG_USER_SUPERVISOR);
+        *entry |= PAGE_FLAG_PRESENT;
         *entry |= pmm_palloc(1) & PAGE_PHYSICAL_ADDRESS_MASK;
         memset((void*)to_vaddr((*entry & PAGE_PHYSICAL_ADDRESS_MASK)), 0, PAGE_SIZE);
     }
@@ -116,14 +116,17 @@ void pt_map(page_table_t *pt, paddr_t paddr, vaddr_t vaddr, page_flags_t flags)
     size_t pt3_idx = (vaddr >> 30) & 0x1FF;
     size_t pt2_idx = (vaddr >> 21) & 0x1FF;
     size_t pt1_idx = (vaddr >> 12) & 0x1FF;
-
+    
     set_page_entry(&pt->entries[pt4_idx]);
+    pt->entries[pt4_idx] |= (flags & (PAGE_FLAG_USER_SUPERVISOR | PAGE_FLAG_READ_WRITE));
 
     page_table_t *pt3 = paddr_ptr(pt->entries[pt4_idx] & PAGE_PHYSICAL_ADDRESS_MASK);
     set_page_entry(&pt3->entries[pt3_idx]);
+    pt3->entries[pt3_idx] |= (flags & (PAGE_FLAG_USER_SUPERVISOR | PAGE_FLAG_READ_WRITE));
 
     page_table_t *pt2 = paddr_ptr(pt3->entries[pt3_idx] & PAGE_PHYSICAL_ADDRESS_MASK);
     set_page_entry(&pt2->entries[pt2_idx]);
+    pt2->entries[pt2_idx] |= (flags & (PAGE_FLAG_USER_SUPERVISOR | PAGE_FLAG_READ_WRITE));
 
     page_table_t *pt1 = paddr_ptr(pt2->entries[pt2_idx] & PAGE_PHYSICAL_ADDRESS_MASK);
     pt1->entries[pt1_idx] = (paddr & PAGE_PHYSICAL_ADDRESS_MASK) | flags;

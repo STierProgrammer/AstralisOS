@@ -161,7 +161,32 @@ enum
 
 enum
 {
-    PT_LOAD = 1,
+    PT_NULL         = 0,
+    PT_LOAD         = 1,
+    PT_DYNAMIC      = 2,
+    PT_INTERP       = 3,
+    PT_NOTE         = 4,
+    PT_SHLIB        = 5,
+    PT_PHDR         = 6,
+    PT_TLS          = 7,
+
+    PT_LOOS         = 0x60000000,
+    PT_HIOS         = 0x6FFFFFFF,
+
+    PT_LOPROC       = 0x70000000,
+    PT_HIPROC       = 0x7FFFFFFF,
+
+    PT_GNU_EH_FRAME = 0x6474E550,
+    PT_GNU_STACK    = 0x6474E551,
+    PT_GNU_RELRO    = 0x6474E552,
+    PT_GNU_PROPERTY = 0x6474E553,
+
+    PT_SUNWBSS      = 0x6FFFFFFA,
+    PT_SUNWSTACK    = 0x6FFFFFFB,
+
+    PT_OPENBSD_RANDOMIZE = 0x65A3DBE6,
+    PT_OPENBSD_WXNEEDED  = 0x65A3DBE7,
+    PT_OPENBSD_BOOTDATA  = 0x65A41BE6,
 };
 
 enum

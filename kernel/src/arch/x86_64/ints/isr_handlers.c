@@ -104,7 +104,7 @@ void isr_exception_handler(exception_frame_t *eframe)
     {
         srprintf("Faulting adddress: %x\n", read_cr2());
         srprintf("Error code: ");
-        print_flags(eframe->error_code, 32, (char**)pf_err_codes);
+        srprintf("%b", eframe->error_code);
         srprintf("\n");
         break; 
     }

@@ -1,4 +1,3 @@
-#include <tasks/elf.h>
 #include <misc/panic.h>
 #include <misc/darray.h>
 #include <mm/alloc.h>
@@ -113,8 +112,9 @@ void kmain(bootloader_ctx_t *ctx)
         debug("Found the test program");
     }
 
-    char programbuf[4096] = { 0 };
-    inode_read(test_program, programbuf, 4096, 0);
+    char *programbuf = vmalloc(2 * 1024 * 1024);
+    debug("Allocated %x", programbuf);
+    inode_read(test_program, programbuf, 2* 1024 * 1024, 0);
     Elf64_Ehdr *hdr = (Elf64_Ehdr*)programbuf;
     if (elf_supported(hdr))
     {

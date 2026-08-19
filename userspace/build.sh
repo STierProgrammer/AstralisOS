@@ -11,3 +11,6 @@ gcc -m64 \
     -Wl,-e,_start \
     test_program.c \
     -o test_program
+
+rm ../initrd/test_program
+mv ./test_program ../initrd/

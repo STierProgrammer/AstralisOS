@@ -26,7 +26,6 @@ void *vmalloc(size_t size)
     return vmalloc_pf(size, PAGE_FLAG_READ_WRITE);
 }
 
-
 void vfree(void *ptr)
 {
     vmm_free(&vheap, (vaddr_t)ptr);

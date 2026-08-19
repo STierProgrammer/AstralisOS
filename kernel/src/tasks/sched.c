@@ -228,16 +228,19 @@ task_t *user_task_create(Elf64_Ehdr *hdr)
                 );
     }
 
-    debug("Entry: %x", hdr->e_entry);
-
     Elf64_Phdr *phdr = (Elf64_Phdr*)((char*)hdr + hdr->e_phoff);
+    vaddr_t heap = 0;
     for (size_t i = 0; i < hdr->e_phnum; i++)
     {
         if (phdr->p_type == PT_LOAD)
         {
-            size_t pages  = align_up(phdr->p_filesz, PAGE_SIZE) / PAGE_SIZE;
+            size_t pages  = align_up(phdr->p_memsz, PAGE_SIZE) / PAGE_SIZE;
             vaddr_t vaddr = phdr->p_vaddr;
             char*   src   = (char*)hdr + phdr->p_offset;
+            if (heap < vaddr)
+                heap = vaddr;
+                
+            size_t remaining = phdr->p_filesz;
             for (size_t j = 0; j < pages; j++)
             {
                 paddr_t page = pmm_alloc(1);
@@ -245,16 +248,24 @@ task_t *user_task_create(Elf64_Ehdr *hdr)
                         task->pt, 
                         page,
                         vaddr,
-                        elf_pflags_to_page_flags(phdr->p_flags) | PAGE_FLAG_USER_SUPERVISOR
+                        elf_pflags_to_page_flags(phdr->p_flags) | PAGE_FLAG_USER_SUPERVISOR | PAGE_FLAG_PRESENT
                         );
+                
+                void *dst = (void*)to_vaddr(page);
+                size_t copy = remaining > PAGE_SIZE ? PAGE_SIZE : remaining;
 
-                memcpy((void*)to_vaddr(page), src, PAGE_SIZE);
-                vaddr += PAGE_SIZE;
-                src   += PAGE_SIZE;
+                memcpy(dst, src, copy);
+                memset(dst + copy, 0, PAGE_SIZE - copy);
+    
+                remaining   -= copy;
+                src         += copy;
+                vaddr       += PAGE_SIZE;
             }
         }
         phdr = (Elf64_Phdr*)((char*)phdr + hdr->e_phentsize);
     }
+    heap += PAGE_SIZE;
+    task->heap = heap;
 
     task->pid = next_pid++;
     list_init(&task->list);

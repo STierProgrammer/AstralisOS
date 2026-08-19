@@ -23,6 +23,7 @@ typedef struct
     list_t          list;
     stack_t         kernel_stack;
     stack_t         user_stack;
+    vaddr_t         heap;
     size_t          pid;
     page_table_t*   pt;
     file_t          fd[256];
