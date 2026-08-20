@@ -1,8 +1,9 @@
 #include <stdarg.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <misc/debug.h>
 
-void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, va_list args)
+void _printf(void *priv, void (*put)(void*, int), void (*puts)(void*, const char *), const char *fmt, va_list args)
 {
     while (*fmt)
     {
@@ -14,13 +15,13 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
             case 's':
             {
                 const char *value = va_arg(args, const char *);
-                puts(value);
+                puts(priv, value);
                 break;
             }
             case 'c':
             {
                 int value = va_arg(args, int);
-                put((char)value);
+                put(priv, (char)value);
                 break;
             } 
             case 'd':
@@ -29,13 +30,13 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
 
                 if (value == 0)
                 {
-                    put('0');
+                    put(priv, '0');
                     break;
                 }
 
                 if (value < 0)
                 {
-                    put('-');
+                    put(priv, '-');
                     value = -value;
                 }
 
@@ -50,7 +51,7 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
 
                 for (int i = 63; i >= 0; i--)
                 {
-                    put(str[i]);
+                    put(priv, str[i]);
                 }
 
                 break;
@@ -64,7 +65,7 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
 
                     if (value == 0)
                     {
-                        put('0');
+                        put(priv, '0');
                         break;
                     }
 
@@ -79,7 +80,7 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
 
                     for (int i = 63; i >= 0; i--)
                     {
-                        put(str[i]);
+                        put(priv, str[i]);
                     }
                 }
                 else
@@ -99,11 +100,11 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
 
                     if (new_val < 10)
                     {
-                        put(new_val + '0');
+                        put(priv, new_val + '0');
                     }
                     else
                     {
-                        put(new_val + 'A' - 10);
+                        put(priv, new_val + 'A' - 10);
                     }
                 }
 
@@ -115,13 +116,13 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
                 for (size_t i = 8 * sizeof(uint64_t); i > 0; i--)
                 {
                     uint8_t new_val = (value >> (i - 1)) & 0b1;
-                    put(new_val + '0');
+                    put(priv, new_val + '0');
                 }
                 break;
             }
             case '%':
             {
-                put('%');
+                put(priv, '%');
 
                 break;
             }
@@ -129,7 +130,7 @@ void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, v
         }
         else
         {
-            put(*fmt);
+            put(priv, *fmt);
         }
 
         fmt++;

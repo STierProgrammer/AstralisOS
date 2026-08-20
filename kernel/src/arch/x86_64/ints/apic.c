@@ -193,7 +193,7 @@ void apic_init(void)
     ioapic_register(4, 0x30, get_lapic_id());
 
     krnlctx(interrupt_controller) = &apic;
-    info(apic_init, "Initalized!");
+    info("Initalized!");
 }
 
 void apic_set_mask(uint8_t irq)

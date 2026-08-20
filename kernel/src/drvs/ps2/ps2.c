@@ -73,7 +73,7 @@ void ps2_init(void)
     ps2_writeData(0xFF);
     data = ps2_readData();
 
-    info(ps2_init, "Initalized!");
+    info("Initalized!");
 }
 
 void detect_ps2_device_type()

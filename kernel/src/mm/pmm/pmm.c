@@ -6,8 +6,9 @@
 #include <misc/helpers.h>
 #include <misc/debug.h>
 
-static pmm_area_t *area_list  = NULL;
 
+
+static pmm_area_t *area_list  = NULL;
 size_t pmm_free_num_pages = 0;
 
 void pmm_init(void)
@@ -46,7 +47,7 @@ void pmm_init(void)
         }
     }
 
-    info(pmm_init, "Initialized!"); 
+    info("Initialized!"); 
 }
 
 paddr_t pmm_palloc(size_t num_pages)

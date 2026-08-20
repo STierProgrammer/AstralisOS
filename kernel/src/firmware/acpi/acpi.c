@@ -114,5 +114,5 @@ void acpi_init(void)
         debug("MADT has not been found!");
     }
 
-    info(acpi_init, "Initalized!");
+    info("Initalized!");
 }   

@@ -36,7 +36,7 @@ void ps2_mouse_init(void)
         return;
 
     krnlctx(interrupt_controller)->clear_mask(12);
-    info(ps2_mouse_init, "Initalized!");
+    info("Initalized!");
 
     ringbuf_init(&evbuf, 256, sizeof(mse_ev_t), RINGBUF_MODE_OVERWRITE, vmalloc);
 

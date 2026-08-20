@@ -2,5 +2,5 @@
 
 #include <stdarg.h>
 
-void _printf(void (*put)(int c), void (*puts)(const char *s), const char *fmt, va_list args);
+void _printf(void *priv, void (*put)(void*, int), void (*puts)(void*, const char *), const char *fmt, va_list args);
 

@@ -57,5 +57,5 @@ void gdt_init(void)
 
     reload_gdt();
 
-    info(gdt_init, "Initialized");
+    info("Initialized");
 }

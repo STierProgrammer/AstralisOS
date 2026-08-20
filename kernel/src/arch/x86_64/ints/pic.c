@@ -32,7 +32,7 @@ void pic_init() {
     outb(PIC2_DATA, 0b11111111);
 
     krnlctx(interrupt_controller) = &pic;
-    info(pic_init, "Initalized!");
+    info("Initalized!");
 }
 
 void pic_disable(void) {

@@ -3,7 +3,6 @@
 #include <misc/ansii.h>
 #include <devs/serial.h>
 
-#define info(from, fmt, ...) srprintf("[   " ANSII_BLUE_FG "INFO" ANSII_RESET "    ]" ANSII_GRAY_FG " %s" ANSII_RESET ": " fmt "\n", #from, ##__VA_ARGS__)
 
 #ifdef __DEBUG__
 #define srdebug(from, fmt, ...)  srprintf("[   " ANSII_RED_FG "DEBUG" ANSII_RESET "   ]" ANSII_GRAY_FG " %s" ANSII_RESET ": " fmt "\n", #from, ##__VA_ARGS__)
@@ -18,3 +17,4 @@
 #define frdebug(from, fmt, ...)
 #define at(num)
 #endif
+

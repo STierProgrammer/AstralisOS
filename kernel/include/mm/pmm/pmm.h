@@ -16,6 +16,10 @@ typedef struct pmm_area_t
     bitmap_t    bitmap;
 } pmm_area_t;
 
+typedef struct {
+    int flags;
+} page_t;
+
 void        pmm_init(void);
 paddr_t     pmm_alloc(size_t size);
 paddr_t     pmm_palloc(size_t num_pages);

@@ -61,5 +61,5 @@ void idt_init(void)
       :
       : "m"(idtr));
 
-  info(idt_init, "Initialized");
+  info("Initialized");
 }

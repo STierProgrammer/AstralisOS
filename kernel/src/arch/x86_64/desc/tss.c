@@ -26,5 +26,5 @@ void tss_init(void)
         : "r"((uint16_t)offsetof(gdt_t, tss_segment)));
 
         
-    info(tss_init, "Initialized");
+    info("Initialized");
 }

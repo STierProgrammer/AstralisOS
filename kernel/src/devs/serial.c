@@ -8,7 +8,10 @@
 #endif
 
 #include <misc/printf.h>
+#include <misc/logger.h>
 #include <devs/serial.h>
+
+logger_t serial_logger;
 
 int serial_init()
 {
@@ -32,6 +35,8 @@ int serial_init()
     // (not-loopback with IRQs enabled and OUT#1 and OUT#2 bits enabled)
     outb(COM1_PORT + 4, 0x0F);
 
+    logger_register(&serial_logger);
+    
     return 0;
 }
 
@@ -69,13 +74,25 @@ void srputs(const char *str)
     }
 }
 
+static void _srput(void *priv, int a)
+{
+    (void)priv;
+    srput(a);
+}
+
+static void _srputs(void *priv, const char *str)
+{
+    (void)priv;
+    srputs(str);
+}
+
 // TODO: Add other specifiers
 void srprintf(const char *fmt, ...)
 {
     va_list args;
     va_start(args, fmt);
  
-    _printf(srput, srputs, fmt, args);
+    _printf(NULL, _srput, _srputs, fmt, args);
 
     va_end(args);
 }
@@ -85,4 +102,14 @@ void serial_com1_callback()
     srdebug(serial_com1_callback, "Called!");
 }
 
+static void serial_log(void *priv, const char *fmt, va_list args)
+{
+    (void)priv;
+    _printf(NULL, _srput, _srputs, fmt, args);
+}
+
+logger_t serial_logger = {
+    .name = "Serial Logger",
+    .log = serial_log
+};
 

@@ -36,5 +36,5 @@ void pit_init(uint32_t freq)
     outb(0x40, l);
     outb(0x40, h);
     irq_clear_mask(0);
-    info(pit_init, "Initalized!");
+    info("Initalized!");
 }
