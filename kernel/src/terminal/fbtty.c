@@ -9,11 +9,12 @@
 
 #define SPACE_SIZE 1
 #define LINE_SPACING 1
-#define FOREGROUND_COLOR 0xFF00
+#define DEFAULT_FOREGROUND_COLOR 0x27CFF5
 
 void fbtty_init(fbtty_t *tty, fb_t *fb)
 {
-    tty->foreground = FOREGROUND_COLOR;
+    tty->foreground = DEFAULT_FOREGROUND_COLOR;
+    tty->background = 0;
     tty->surface = gfx_surface_create(fb);
     tty->cursor_x = 0;
     tty->cursor_y = 0;
@@ -64,32 +65,32 @@ void fbtty_put(fbtty_t *tty, const char ch)
     }
 
     size_t prev_cursor_x = tty->cursor_x;
-    gfx_draw_char(tty->surface, ch, tty->font, tty->cursor_x, tty->cursor_y, FOREGROUND_COLOR);
+    gfx_draw_char(tty->surface, ch, tty->font, tty->cursor_x, tty->cursor_y, tty->foreground);
     tty->cursor_x += tty->font->width + SPACE_SIZE;
-
     gfx_surface_sync(tty->surface, prev_cursor_x + tty->cursor_y * fbtty_width(tty), tty->cursor_x + fbtty_width(tty) * (tty->cursor_y + tty->font->height));
 }
 
-void fbtty_write_str(fbtty_t *tty, const char *str)
+void fbtty_puts(fbtty_t *tty, const char *str)
 {
     if (!str) 
         return;
+
     const char *s = str;
     while (*s)
     {
-        fbtty_write_char(tty, *s);
+        fbtty_put(tty, *s);
         s++;
     }
 }
 
 static void logger_put(void *priv, int c)
 {
-    fbtty_write_char((fbtty_t*)priv, c);
+    fbtty_put((fbtty_t*)priv, c);
 }
 
 static void logger_puts(void *priv, const char *str)
 {
-    fbtty_write_str((fbtty_t*)priv, str);
+    fbtty_puts((fbtty_t*)priv, str);
 }
 
 void fbtty_log(void *priv, const char *fmt, va_list args)

@@ -3,8 +3,8 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <libds/include/list.h>
+#include <kernel.h>
 
-typedef intptr_t ssize_t;
 typedef ssize_t(*write_fn_t)(const void *buf, size_t count);
 typedef ssize_t(*read_fn_t)(void *buf, size_t count);
 

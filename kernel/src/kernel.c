@@ -83,15 +83,7 @@ void kmain(bootloader_ctx_t *ctx)
 
     fbtty_t *fbtty = kmalloc(sizeof(fbtty_t));
     fbtty_init(fbtty, &fb);
-
-    logger_t fbtty_logger = {
-        .log = fbtty_log,
-        .name = "fbtty logger",
-        .priv = fbtty
-    };
-
-    logger_register(&fbtty_logger);
-    debug("sigma");
+    
     ps2_init();
     ps2_keyboard_init();
     ps2_mouse_init();
@@ -100,8 +92,7 @@ void kmain(bootloader_ctx_t *ctx)
     fs_mount(&tmpfs, &vfs_root);
 
     initrd_init();
-
-    
+ 
     inode_t *sigma_txt = NULL;
     const path_t sigma_txt_path = vfs_path_from_abs("/sigma.txt");
     vfs_create(&sigma_txt_path, INODE_FILE, &sigma_txt);

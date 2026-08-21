@@ -16,6 +16,6 @@ typedef struct logger_t {
 void logger_register(logger_t *logger);
 void logger_broadcast(const char *fmt, ...);
 
-#define info(fmt, ...) (logger_broadcast("[   " ANSII_BLUE_FG "INFO" ANSII_RESET "    ]" ANSII_GRAY_FG " %s" ANSII_RESET ": " fmt "\n", __func__, ##__VA_ARGS__))
+#define info(fmt, ...) (logger_broadcast("[   " "INFO" "    ]" " %s" ": " fmt "\n", __func__, ##__VA_ARGS__))
 
 

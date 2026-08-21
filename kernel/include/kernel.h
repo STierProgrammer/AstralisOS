@@ -3,6 +3,8 @@
 #include <bootstub.h>
 #include <stdint.h>
 
+typedef intptr_t ssize_t;
+
 #define PAGE_SIZE 4096
 
 #define to_vaddr(paddr) (vaddr_t)(((uintptr_t)(paddr)) + krnl_ctx.bootloader_ctx->hhdm)
