@@ -24,7 +24,7 @@ iso: build
 	make -C target/$(ARCH)/$(BOOTLDR)/
 
 run:
-	@qemu-system-x86_64 \
+	$(QEMU) \
 		-serial stdio \
 		-d int \
 		-D qemu.log \
@@ -35,7 +35,7 @@ run:
 		$(BUILD_DIR)/image.iso
 
 debug:
-	@qemu-system-x86_64 \
+	$(QEMU) \
 		-serial stdio \
 		-d int \
 		-D qemu.log \
