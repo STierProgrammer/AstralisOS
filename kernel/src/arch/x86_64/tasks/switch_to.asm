@@ -1,7 +1,12 @@
+[BITS 64]
+
+default rel
+
 TASK_RSP_OFFSET equ 16
 
 extern task_switch
 
+section .text
 global switch_to
 switch_to:
     push rbx

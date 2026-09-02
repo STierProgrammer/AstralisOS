@@ -1,5 +1,11 @@
+[BITS 64]
+
+default rel
+
 global userspace_jump
 extern user_test_entry
+
+section .text
 userspace_jump:
 	mov rax, (4 * 8) | 3
 	mov ds, ax

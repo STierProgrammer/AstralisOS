@@ -1,4 +1,7 @@
 ; Taken from https://wiki.osdev.org/SSE
+
+default rel
+
 section .text
 global sse_enable
 sse_enable:

@@ -1,5 +1,7 @@
 ; Taken from: https://github.com/purpleK2/kernel/blob/e6ff7cdeb50169a6715c6e6c0919a46f6f7b4245/src/arch/x86_64/math/fpu.c#L7
 
+default rel
+
 section .text
 global fpu_enable
 fpu_enable:

@@ -49,12 +49,12 @@ static inline void list_remove(list_t *list) {
     list->prev = list;
 }
 
-__attribute__((unused))
-static list_t* list_next(list_t* list) {
+static inline list_t* list_next(list_t* list) {
     return list->next != list ? list->next : NULL;
 }
 
-#define foreach(var, head) for (list_t *var = (head)->next; var != (head); var = var->next)
 #define LIST_HEAD_INIT(name) { &(name), &(name) }
+
+#define foreach(var, head) for (list_t *var = (head)->next; var != (head); var = var->next)
 
 

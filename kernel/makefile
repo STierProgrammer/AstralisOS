@@ -6,7 +6,8 @@ CFLAGS    		:= -Wall -Wextra -std=gnu11 \
              		-mno-mmx -mno-red-zone -mcmodel=kernel -g \
 					-mno-80387 -msse 
 CPPFLAGS  		:=  -I$(ROOT_DIR)/boot/ -I$(ROOT_DIR)/kernel/include/ -I$(ROOT_DIR)/libc/include/ -I$(ROOT_DIR)/libs/ -D __ARCH_X86_64__ -D __DEBUG__ 	-MMD -MP
-NASMFLAGS 		:= -Wall -Werror -f elf64 
+NASMFLAGS 		:= -Wall -f elf64  
 
 MODULE_NAME := kernel
 include $(BUILD_MK)
+

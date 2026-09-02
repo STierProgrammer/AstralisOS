@@ -10,6 +10,7 @@ DEPS      := $(patsubst %.o, %.d, $(C_OBJS))
 MODULES := $(patsubst %/makefile, %, $(wildcard */makefile))
 	
 all: $(C_OBJS) $(ASM_OBJS) modules
+	@echo $(MODULES)
 
 modules:
 	@for m in $(MODULES); do \
@@ -25,3 +26,4 @@ $(OBJS_DIR)/$(MODULE_NAME)/%.asm.o: src/%.asm
 	$(NASM) $(NASMFLAGS) $< -o $@
 
 -include $(DEPS)
+

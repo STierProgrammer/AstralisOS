@@ -1,6 +1,5 @@
 #include <stdint.h>
 
-
 static inline long syscall1(long n, long a1){
 	long ret;
 	asm volatile ("int $0x80" : "=a"(ret) : "a"(n), "D"(a1) : "memory");

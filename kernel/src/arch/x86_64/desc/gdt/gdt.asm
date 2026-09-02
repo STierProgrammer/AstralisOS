@@ -1,11 +1,13 @@
 [BITS 64]
+default rel
 
 section .text
 global reload_gdt
 
 reload_gdt:
+    lea rax, [rel .reload_cs]
     push 0x08
-    push .reload_cs
+    push rax
     retfq
 
 .reload_cs:

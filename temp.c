@@ -1,7 +1,7 @@
-
 extern ringbuf_t key_ringbuf;
 #define SMLIB_IMPLEMENTATION
 #include <libs/smlib.h>
+
 typedef struct model3d_t
 {
     const vec3_t *vcs;

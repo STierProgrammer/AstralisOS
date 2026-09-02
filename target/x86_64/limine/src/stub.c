@@ -1,10 +1,10 @@
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 
 #include "bootstub.h"
 #include "fb.h"
 #include "modules.h"
-#include "string.h"
 
 static bootloader_ctx_t bootloader_ctx;
 static void load_bootloader_ctx(void);

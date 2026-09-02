@@ -8,6 +8,50 @@
 #include <arch/x86_64/mm/paging.h>
 #endif
 
+#define SYSCALL_SIG(name) long sys_##name(long arg1, long arg2, long arg3, long arg4, long arg5, long arg6)
+
+#define SYSCALL_DEFINE1(ret, name, tp1, a1)     \
+    static ret _sys_##name(tp1 a1);             \
+    SYSCALL_SIG(name) {                         \
+        return (long)_sys_##name((tp1)arg1);    \
+    }                                           \
+    static ret _sys_##name(tp1 a1)
+
+#define SYSCALL_DEFINE2(ret, name, tp1, a1, tp2, a2)        \
+    static ret _sys_##name(tp1 a1, tp2 a2);                 \
+    SYSCALL_SIG(name) {                                     \
+        return (long)_sys_##name((tp1)arg1, (tp2)arg2);     \
+    }                                                       \
+    static ret _sys_##name(tp1 a1, tp2 a2)
+
+#define SYSCALL_DEFINE3(ret, name, tp1, a1, tp2, a2, tp3, a3)           \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3);                     \
+    SYSCALL_SIG(name) {                                                 \
+        return (long)_sys_##name((tp1)arg1, (tp2)arg2, (tp3)arg3);      \
+    }                                                                   \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3)
+
+#define SYSCALL_DEFINE4(ret, name, tp1, a1, tp2, a2, tp3, a3, tp4, a4)              \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3, tp4 a4);                         \
+    SYSCALL_SIG(name) {                                                             \
+        return (long)_sys_##name((tp1)arg1, (tp2)arg2, (tp3)arg3, (tp4)arg4);       \
+    }                                                                               \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3, tp4 a4)
+
+#define SYSCALL_DEFINE5(ret, name, tp1, a1, tp2, a2, tp3, a3, tp4, a4, tp5, a5)                 \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3, tp4 a4, tp5 a5);                             \
+    SYSCALL_SIG(name) {                                                                         \
+        return (long)_sys_##name((tp1)arg1, (tp2)arg2, (tp3)arg3, (tp4)arg4, (tp5)arg5);        \
+    }                                                                                           \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3, tp4 a4, tp5 a5)
+
+#define SYSCALL_DEFINE6(ret, name, tp1, a1, tp2, a2, tp3, a3, tp4, a4, tp5, a5, tp6, a6)         \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3, tp4 a4, tp5 a5, tp6 a6);                     \
+    SYSCALL_SIG(name) {                                                                                     \
+        return (long)_sys_##name((tp1)arg1, (tp2)arg2, (tp3)arg3, (tp4)arg4, (tp5)arg5, (tp6)arg6);         \
+    }                                                                                                       \
+    static ret _sys_##name(tp1 a1, tp2 a2, tp3 a3, tp4 a4, tp5 a5, tp6 a6)
+
 enum
 {
     SYS_OPEN    = 0,
@@ -19,19 +63,19 @@ enum
     SYS_MUNMAP  = 6
 };
 
-typedef long syscall_fn_t(unsigned long arg1, unsigned long arg2, unsigned long arg3, unsigned long arg4, unsigned long arg5, unsigned long arg6);
-#define SYSCALL(NR, func) [NR] = (syscall_fn_t*)(func)
+typedef long syscall_fn_t(long arg1, long arg2, long arg3, long arg4, long arg5, long arg6);
+#define SYSCALL(NR, func) [NR] = func
 #define NUM_SYSCALLS sizeof(syscall_table)/sizeof(*syscall_table)
 
 typedef long off_t;
 
-int sys_open(const char *path)
+SYSCALL_DEFINE1(int, open, const char *, path)
 {
     srdebug(sys_open, "opened path: %s", path);
     return task_open(sched_curr_task(), path);
 }
- 
-int sys_close(int fd)
+
+SYSCALL_DEFINE1(int, close, int, fd)
 {
     srdebug(sys_close, "closing fd: %d", fd);
     return task_close(sched_curr_task(), fd);
@@ -68,23 +112,24 @@ vaddr_t sys_sbrk(intptr_t increment)
 
 vaddr_t sys_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
 {
-    
+    (void)addr;
+    (void)length;
+    (void)prot;
+    (void)flags;
+    (void)fd;
+    (void)offset;
 }
 
 int sys_munmap(void *addr, size_t length)
 {
-
+    (void)addr;
+    (void)length;
 }
 
 syscall_fn_t *syscall_table[] =
 {
     SYSCALL(SYS_OPEN, sys_open),
     SYSCALL(SYS_CLOSE, sys_close),
-    SYSCALL(SYS_WRITE, sys_write),
-    SYSCALL(SYS_READ, sys_read),
-    SYSCALL(SYS_SBRK, sys_sbrk),
-    SYSCALL(SYS_MMAP, sys_mmap),
-    SYSCALL(SYS_MUNMAP, sys_munmap),
 };
 
 void syscall_handler(interrupt_frame_t *iframe)

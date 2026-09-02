@@ -2,7 +2,7 @@
 
 include ../../../make.conf
 
-CPPFLAGS    := -I./limine/ -I$(ROOT_DIR)/boot/ -D __protocol_$(PROTOCOL)__ -MMD -MP
+CPPFLAGS    := -I./limine/ -I$(ROOT_DIR)/boot/ -I$(ROOT_DIR)/libc/include/ -D __protocol_$(PROTOCOL)__ -MMD -MP
 MODULE_NAME := limine
 
 ifeq ($(wildcard limine/limine.h),)
@@ -24,7 +24,7 @@ ISO         := $(BUILD_DIR)/image.iso
 all: $(ISO)
 
 $(KERNEL): $(ALL_OBJS)
-	@cc $(CFLAGS) $(LDFLAGS) $(ALL_OBJS) -o $(KERNEL)
+	$(CC) $(CFLAGS) $(LDFLAGS) $(ALL_OBJS) -o $(KERNEL)
 
 $(ISO): $(KERNEL) limine.conf
 	@mkdir -p $(ISO_ROOT_DIR)/boot/limine $(ISO_ROOT_DIR)/EFI/BOOT
@@ -46,3 +46,4 @@ $(ISO): $(KERNEL) limine.conf
 	         --protective-msdos-label \
 	         $(ISO_ROOT_DIR) -o $(ISO)
 	@./limine/limine bios-install $(ISO)
+
