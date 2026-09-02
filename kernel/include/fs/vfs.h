@@ -7,7 +7,7 @@
 typedef struct path_t path_t;
 typedef struct inode_t inode_t;
 
-typedef enum inode_kind_t: uint8_t 
+typedef enum inode_kind_t 
 {
     INODE_DIR,
     INODE_FILE,

@@ -116,9 +116,8 @@ void isr_exception_handler(exception_frame_t *eframe)
     default:
         break;
     }
-
-    for (;;)
-        ;
+    
+    hcf();
 }
 
 typedef enum interrupt_t {

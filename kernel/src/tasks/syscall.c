@@ -81,19 +81,19 @@ SYSCALL_DEFINE1(int, close, int, fd)
     return task_close(sched_curr_task(), fd);
 }
  
-long sys_write(int fd, const void *buf, size_t count)
+SYSCALL_DEFINE3(long, write, int, fd, const void*, buf, size_t, count)
 {
     srdebug(sys_write, "writing to fd: %d", fd);
     return task_write(sched_curr_task(), fd, buf, count);
 }
 
-long sys_read(int fd, void *buf, size_t count)
+SYSCALL_DEFINE3(long, read, int, fd, void*, buf, size_t, count)
 {
     srdebug(sys_read, "reading from fd: %d", fd);
     return task_read(sched_curr_task(), fd, buf, count);
 }
 
-vaddr_t sys_sbrk(intptr_t increment)
+SYSCALL_DEFINE1(vaddr_t, sbrk, intptr_t, increment)
 {
     if (increment == 0)
         return sched_curr_task()->heap;
@@ -108,9 +108,9 @@ vaddr_t sys_sbrk(intptr_t increment)
     return ptr;
 }
 
-#define MAP_ANONYMOUS   0
+#define MAP_ANONYMOUS 0
 
-vaddr_t sys_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t offset)
+SYSCALL_DEFINE6(vaddr_t, mmap, void*, addr, size_t, length, int, prot, int, flags, int, fd, off_t, offset)
 {
     (void)addr;
     (void)length;
@@ -120,7 +120,7 @@ vaddr_t sys_mmap(void *addr, size_t length, int prot, int flags, int fd, off_t o
     (void)offset;
 }
 
-int sys_munmap(void *addr, size_t length)
+SYSCALL_DEFINE2(int, munmap, void*, addr, size_t, length)
 {
     (void)addr;
     (void)length;
@@ -130,12 +130,15 @@ syscall_fn_t *syscall_table[] =
 {
     SYSCALL(SYS_OPEN, sys_open),
     SYSCALL(SYS_CLOSE, sys_close),
+    SYSCALL(SYS_MMAP, sys_mmap),
+    SYSCALL(SYS_SBRK, sys_sbrk),
+    SYSCALL(SYS_READ, sys_read),
+    SYSCALL(SYS_MUNMAP, sys_munmap),
 };
 
 void syscall_handler(interrupt_frame_t *iframe)
 {
     uint64_t syscall_number = iframe->rax;   
-    
     if (syscall_number < NUM_SYSCALLS)
     {
         iframe->rax = syscall_table[syscall_number](iframe->rdi, iframe->rsi, iframe->rdx, iframe->rcx, iframe->r8, iframe->r9);

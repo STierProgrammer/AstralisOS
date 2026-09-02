@@ -31,7 +31,6 @@ run:
 		-no-reboot \
 		-no-shutdown \
 		-m 2g \
-		-monitor telnet:127.0.0.1:1235,server,nowait\
 		$(BUILD_DIR)/image.iso
 
 debug:

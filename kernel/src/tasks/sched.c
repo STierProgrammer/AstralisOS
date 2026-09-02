@@ -359,4 +359,6 @@ void sched_init(void)
     reaper_task = kernel_task_create(reaper_task_entry);
     curr_task = &dummy_task;
     sti();
+
+    srdebug(sched_init, "Initalized");
 }
