@@ -252,10 +252,11 @@ void kmain(bootloader_ctx_t *ctx)
     
     fb_t fb;
     bootctx(fbs).get_fb(&bootctx(fbs), &fb, 0);
-
+    
     fbtty = kmalloc(sizeof(fbtty_t));
     fbtty_init(fbtty, &fb);
-    
+    gfx_draw_rect(fbtty->surface, 0, 0, 60, 60, 0x702963);
+    gfx_surface_sync(fbtty->surface, 0, 60 + 60  * fbtty->surface->framebuffer->width);
     ps2_init();
     ps2_keyboard_init();
     ps2_mouse_init();
