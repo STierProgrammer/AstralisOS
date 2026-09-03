@@ -7,7 +7,7 @@
 #include <misc/debug.h>
 #include <terminal/fbtty.h>
 
-fbtty_t fbtty;
+static fbtty_t fbtty;
 
 #define WIDTH  (16 * 16 * 2)
 #define HEIGHT (9  * 16 * 2)

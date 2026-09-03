@@ -6,10 +6,30 @@
 #include <misc/helpers.h>
 #include <misc/debug.h>
 
-
-
 static pmm_area_t *area_list  = NULL;
 size_t pmm_free_num_pages = 0;
+static size_t max_pfn = 0;
+
+static void get_max_pfn(void)
+{
+    memmap_t *memmap = &bootctx(memmap);
+    for (size_t i = 0; i < memmap->num_entries; i++)
+    {
+        memmap_entry_t entry;
+        memmap->get_entry(memmap, &entry, i);
+        if (entry.type == MEMMAP_USABLE)
+        {
+            paddr_t base = align_up(entry.base, PAGE_SIZE);
+    
+            size_t pfn = base / PAGE_SIZE;
+            if (pfn > max_pfn)
+            {
+                max_pfn = pfn;
+            }
+        }
+    }
+}
+
 
 void pmm_init(void)
 {
@@ -24,7 +44,10 @@ void pmm_init(void)
             paddr_t base = align_up(entry.base, PAGE_SIZE);
             size_t  len  = align_down(entry.length, PAGE_SIZE);
             size_t  num_pages = len / PAGE_SIZE;
-    
+            size_t  pfn = base / PAGE_SIZE;
+            if (pfn > max_pfn)
+                max_pfn = pfn;
+
             if (num_pages > 1)
             {
                 size_t num_free_pages = (8 * (num_pages * 4096 - 4095) - 7) / (4096 * 8 + 1) + 1;
@@ -46,7 +69,8 @@ void pmm_init(void)
             }
         }
     }
-
+    
+    debug("%d", max_pfn);
     info("Initialized!"); 
 }
 
@@ -74,7 +98,8 @@ paddr_t pmm_palloc(size_t num_pages)
         }
         curr = curr->next;
     }
-    return 0;}
+    return 0;
+}
 
 void pmm_pfree(paddr_t addr, size_t num_pages)
 {
