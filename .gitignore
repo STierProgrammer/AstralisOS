@@ -1,0 +1,5 @@
+qemu.log
+compile_commands.json
+.build/
+.cache/
+.git/
