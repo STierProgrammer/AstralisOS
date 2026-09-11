@@ -3,6 +3,22 @@
 #include <mm/slab.h>
 #include <misc/strview.h>
 #include <stddef.h>
+#include <sys/types.h>
+
+/* Owner */
+#define S_IRUSR 00400 // read
+#define S_IWUSR 00200 // write
+#define S_IXUSR 00100 // exec
+
+/* Group */
+#define S_IRGRP 00040 // read
+#define S_IWGRP 00020 // write
+#define S_IXGRP 00010 // exec
+
+/* Other */
+#define S_IROTH 00004 // read
+#define S_IWOTH 00002 // write
+#define S_IXOTH 00001 // exec
 
 typedef struct path_t path_t;
 typedef struct inode_t inode_t;
@@ -26,9 +42,15 @@ typedef struct inode_ops_t
 
 typedef struct inode_t 
 {
-    inode_kind_t        kind;
-    const inode_ops_t * ops;
-    void *              priv;
+    ino_t ino;
+    inode_kind_t kind;
+    const inode_ops_t *ops;
+    void* priv;
+
+    size_t  size;
+    mode_t  mode;
+    uid_t   uid;
+    gid_t   gid;
 } inode_t;
 
 typedef struct superblock_t 

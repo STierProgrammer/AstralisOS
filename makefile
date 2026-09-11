@@ -31,6 +31,7 @@ run:
 		-no-reboot \
 		-no-shutdown \
 		-m 2g \
+		-machine pc-q35-10.1\
 		$(BUILD_DIR)/image.iso
 
 debug:

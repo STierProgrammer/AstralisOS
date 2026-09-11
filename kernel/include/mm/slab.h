@@ -38,6 +38,7 @@ typedef struct
     size_t num_objs_inuse;
     void *smem;
     // TODO: prev pointer is not needed
+    slab_freelist_t freelist;
     list_t freelist;
 } slab_t;
 

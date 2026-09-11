@@ -192,6 +192,9 @@ char key_to_char(key_t key, bool shift) {
   }
 }
 fbtty_t *fbtty;
+    
+
+
 
 // FOR TESTING ON REAL HARDWARE
 void kbd_task_entry(void)
@@ -229,7 +232,6 @@ void kbd_task_entry(void)
 void kmain(bootloader_ctx_t *ctx)
 {
     krnlctx(bootloader_ctx) = ctx;
-
     serial_init();
     gdt_init();
     idt_init();
@@ -255,8 +257,19 @@ void kmain(bootloader_ctx_t *ctx)
     
     fbtty = kmalloc(sizeof(fbtty_t));
     fbtty_init(fbtty, &fb);
-    gfx_draw_rect(fbtty->surface, 0, 0, 60, 60, 0x702963);
-    gfx_surface_sync(fbtty->surface, 0, 60 + 60  * fbtty->surface->framebuffer->width);
+
+    // logger_register(&fbtty_logger);
+
+    // gfx_draw_rect(fbtty->surface, 0, 0, 60, 60, 0x702963);
+    // gfx_surface_sync(fbtty->surface, 0, 60 + 60  * fbtty->surface->framebuffer->width);
+    logger_t fbtty_logger = {
+        .name = "fbtty logger",
+        .log = fbtty_log,
+        .priv = fbtty
+    };
+
+    logger_register(&fbtty_logger);
+
     ps2_init();
     ps2_keyboard_init();
     ps2_mouse_init();
@@ -287,6 +300,7 @@ void kmain(bootloader_ctx_t *ctx)
     {
         debug("Found the test program");
     }
+    info("test_program size: %zu", test_program->size);
 
     char *programbuf = vmalloc(2 * 1024 * 1024);
     inode_read(test_program, programbuf, 2* 1024 * 1024, 0);
@@ -311,3 +325,5 @@ void kmain(bootloader_ctx_t *ctx)
         task_yield();
     hcf();
 }
+
+

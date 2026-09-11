@@ -36,7 +36,9 @@ int serial_init()
     outb(COM1_PORT + 4, 0x0F);
 
     logger_register(&serial_logger);
-    
+
+    info("Initialized!");
+
     return 0;
 }
 

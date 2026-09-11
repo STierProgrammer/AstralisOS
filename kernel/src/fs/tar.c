@@ -43,7 +43,6 @@ void tar_extract(void *tar)
             }
         } else if (curr_file->typeflag == TAR_FILE)
         {
-            srdebug(tar_extract, "%s", full_path);
             path_t path = vfs_path_from_abs(full_path);
             inode_t *inode = NULL;
             int e;
@@ -52,10 +51,8 @@ void tar_extract(void *tar)
                 srdebug(tar_extract, "Failed to create a file: %d", e);
                 break;
             }
-
-            srdebug(tar_extract, "size: %zu", file_size);
-
             inode_write(inode, addr + 512, file_size, 0);
+            inode->size = file_size;
         }
 
         addr += (((uint64_t)file_size + 1023) / 512) * 512;

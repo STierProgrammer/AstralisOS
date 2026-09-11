@@ -73,6 +73,8 @@ void acpi_init(void)
     rsdp = acpi_get_rsdp(); 
     xsdp = acpi_get_rsdp();
     
+    info("Using ACPI revision %d", rsdp->revision);
+
     fadt_t *fadt_header = acpi_find_sdt("FACP");
     if (!fadt_header)
     {

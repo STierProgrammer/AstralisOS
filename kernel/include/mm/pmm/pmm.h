@@ -3,8 +3,16 @@
 #include <stddef.h>
 #include <stdint.h>
 #include <libds/include/bitmap.h>
+#include <libds/include/list.h>
 
 extern size_t pmm_free_num_pages;
+
+typedef struct page_t
+{
+    list_t      list;
+    size_t      refcount;
+    long        flags;
+} page_t;
 
 typedef struct pmm_area_t pmm_area_t;
 typedef struct pmm_area_t
@@ -15,10 +23,6 @@ typedef struct pmm_area_t
     pmm_area_t* next;
     bitmap_t    bitmap;
 } pmm_area_t;
-
-typedef struct {
-    int flags;
-} page_t;
 
 void        pmm_init(void);
 paddr_t     pmm_alloc(size_t size);

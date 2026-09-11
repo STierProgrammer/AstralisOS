@@ -30,6 +30,10 @@ static void get_max_pfn(void)
     }
 }
 
+static void reserve_page_db(void)
+{
+    size_t size = (max_pfn + 1) * sizeof(page_t);  
+}
 
 void pmm_init(void)
 {
@@ -70,7 +74,6 @@ void pmm_init(void)
         }
     }
     
-    debug("%d", max_pfn);
     info("Initialized!"); 
 }
 
