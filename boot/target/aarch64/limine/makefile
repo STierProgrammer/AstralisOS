@@ -16,7 +16,7 @@ CPPFLAGS    := -I./limine/ \
 CFLAGS      := -Wall -Wextra -std=gnu11 -ffreestanding -fno-stack-protector \
                -fno-stack-check -fno-PIC \
 
-LDFLAGS     := -Wl,-m,elf_$(ARCH) -Wl,--build-id=none -nostdlib -static \
+LDFLAGS     := -Wl,-m,aarch64elf -Wl,--build-id=none -nostdlib -static \
                -z max-page-size=0x1000 -T ./linker.ld -fuse-ld=lld
 
 KERNEL      := kernel

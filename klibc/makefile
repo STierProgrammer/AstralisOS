@@ -9,13 +9,11 @@ CFLAGS := \
     -fno-stack-check \
     -fno-PIC \
 
-CPPFLAGS  		:=  -I$(ROOT_DIR)/boot/ \
-					-I$(ROOT_DIR)/kernel/include \
-					-I$(ROOT_DIR)/klibc/include \
+CPPFLAGS  		:=  -Iinclude \
 					-MMD \
 					-MP
 
 NASMFLAGS 		:= -Wall -f elf64  
 
-MODULE_NAME := kernel
+MODULE_NAME := klibc
 include $(BUILD_MK)

@@ -1,21 +1,17 @@
 #include "bootstub.h"
-#include "fb.h"
 
-#include "devs/serial.h"
+#ifdef ARCH_X86_64
+#include "arch/x86_64/cpu/cpu.h"
+#include "arch/x86_64/devs/serial.h"
+#elif ARCH_AARCH64
+#include "arch/aarch64/cpu/cpu.h"
+#endif
 
 void kmain(bootctx_t *ctx)
 {
-    serial_init();
-
-    srput('c');
-    fb_t fb;
-    ctx->fbs.get_fb(&ctx->fbs, &fb, 0);
-
-    for (size_t x = 0; x < fb.width; x++)
-    {
-        fb.addr[x] = colorFromRGB(&fb, 128, 128, 128);
-    }
-
-    for (;;)
-        ;
+    (void)ctx;
+    srputs("Hello, World!");
+    hcf();
 }
+
+

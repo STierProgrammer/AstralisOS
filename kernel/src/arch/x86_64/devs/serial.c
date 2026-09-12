@@ -2,9 +2,10 @@
 #include <stdarg.h>
 #include <stddef.h>
 
-#include "devs/serial.h"
-
+#include "arch/x86_64/devs/serial.h"
 #include "arch/x86_64/io.h"
+
+#include "misc/printf.h"
 
 int serial_init()
 {
@@ -63,5 +64,27 @@ void srputs(const char *str)
         srput(*str);
         str++;
     }
+}
+
+static void _srput(void *priv, int a)
+{
+    (void)priv;
+    srput(a);
+}
+
+static void _srputs(void *priv, const char *str)
+{
+    (void)priv;
+    srputs(str);
+}
+
+void srprintf(const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+ 
+    _printf(NULL, _srput, _srputs, fmt, args);
+
+    va_end(args);
 }
 
